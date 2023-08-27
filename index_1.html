@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Emotion Detection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      background: #111;
+	    height: 100vh;
+    }
+    .button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+    .audio-player {
+      margin-top: 10px;
+    }
+    .h2{
+      text-decoration: underline;
+      font-style: italic;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+    /*background css*/
+
+    
+.wrapper span {
+	position: fixed;
+	bottom: -180px;
+	height: 50px;
+	width: 50px;
+	z-index: -1;
+	background-color: #18191f;
+	box-shadow: 0 0 50px #0072ff, 0 0 100px #0072ff, 0 0 150px #0072ff, 0 0 200px #0072ff;
+	animation: animate 10s linear infinite;
+}
+.wrapper span:nth-child(1) {
+	left: 60px;
+	animation-delay: 0.6s;
+}
+.wrapper span:nth-child(2) {
+	left: 10%;
+	animation-delay: 3s;
+	width: 60px;
+	height: 60px;
+}
+.wrapper span:nth-child(3) {
+	left: 20%;
+	animation-delay: 2s;
+}
+.wrapper span:nth-child(4) {
+	left: 30%;
+	animation-delay: 5s;
+	width: 80px;
+	height: 80px;
+}
+.wrapper span:nth-child(5) {
+	left: 40%;
+	animation-delay: 1s;
+}
+.wrapper span:nth-child(6) {
+	left: 50%;
+	animation-delay: 7s;
+}
+.wrapper span:nth-child(7) {
+	left: 60%;
+	animation-delay: 6s;
+	width: 100px;
+	height: 100px;
+}
+.wrapper span:nth-child(8) {
+	left: 70%;
+	animation-delay: 8s;
+}
+.wrapper span:nth-child(9) {
+	left: 80%;
+	animation-delay: 6s;
+	width: 90px;
+	height: 90px;
+}
+.wrapper span:nth-child(10) {
+	left: 90%;
+	animation-delay: 4s;
+}
+.banner {
+	display: flex;
+	justify-content: center;
+    color:rgb(36, 241, 36)
+    outline-color: #ff006a;
+	align-items: center;
+	height: 100vh;
+}
+.content h2 b {
+	-webkit-text-fill-color: transparent;
+	-webkit-text-stroke-width: 3px;
+	-webkit-text-stroke-color: #fff;
+	font-family: montserrat;
+	font-size: 80px;
+	text-transform: uppercase;
+	letter-spacing: 12px;
+}
+@keyframes animate {
+	0% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+	80% {
+		opacity: .7;
+	}
+	100% {
+		transform: translateY(-800px) rotate(360deg);
+		opacity: 0;
+	}
+}
+  
+ 
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Voice Emotion Detection</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/index">Home</a>
+        </li>
+        <li class="nav-item">
+          <!--<a class="nav-link" href="about/">About</a>-->
+          <a class="nav-link" href="/about">About</a>
+
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contact">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="wrapper">
+    <!-- Background effects -->
+  </div>
+
+  <div class="banner">
+    <div class="content">
+      <center>
+        <h2>
+          <b>Voice Emotion Detection</b>
+        </h2>
+        <h2 class="h2">Audio Recorder and Player</h2>
+        <div>
+          <form action="/predict" method="POST" enctype="multipart/form-data">
+            <button type="submit" id="recordButton" class="button">Record</button>
+            <button type="button" id="stopButton" class="button" disabled>Stop</button>
+            <button type="button" id="playButton" class="button" disabled>Play</button>
+            <a id="downloadButton" class="button" disabled>Download</a>
+          </form>
+        </div>
+
+        <div class="audio-player">
+          <audio id="audioPlayer" controls></audio>
+        </div>
+
+        <div>
+          <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
+            <input type="file" id="fileInput" name="audio" accept="audio/*">
+            <button type="submit" id="playSelectedButton" class="button" disabled>Play Selected</button>
+          </form>
+        </div>
+
+        <div>
+          <h2 class="h2">Display predicted emotion</h2>
+          <button type="submit" id="predictButton" class="button" disabled>Predict</button>
+          <p>Predicted Emotion: {{ predicted_emotion }}</p>
+          
+        </div>
+      </center>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+  <script>
+    // Add your JavaScript code here    <textarea id="predictionOutput" name="emotion" rows="4" cols="50" readonly></textarea>
+  const recordButton = document.getElementById('recordButton');
+  const stopButton = document.getElementById('stopButton');
+  const playButton = document.getElementById('playButton');
+  const downloadButton = document.getElementById('downloadButton');
+  const predictButton = document.getElementById('predictButton');
+  const predictionOutput = document.getElementById('predictionOutput');
+
+  const fileInput = document.getElementById('fileInput');
+  const playSelectedButton = document.getElementById('playSelectedButton');
+
+  let stream;
+  let recorder;
+  let audioChunks = [];
+  let audioPlayer = document.getElementById('audioPlayer');
+
+  recordButton.addEventListener('click', startRecording);
+  stopButton.addEventListener('click', stopRecording);
+  playButton.addEventListener('click', playRecording);
+  downloadButton.addEventListener('click', downloadRecording);
+  fileInput.addEventListener('change', handleFileSelect);
+  playSelectedButton.addEventListener('click', playSelectedFile);
+  predictButton.addEventListener('click', predictAudio);
+
+  function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(function (audioStream) {
+        stream = audioStream;
+        const audioContext = new AudioContext();
+        const input = audioContext.createMediaStreamSource(stream);
+        recorder = new Recorder(input);
+
+        recorder.record();
+        recordButton.disabled = true;
+        stopButton.disabled = false;
+        playButton.disabled = true;
+        downloadButton.disabled = true;
+        predictButton.disabled = true;
+      })
+      .catch(function (err) {
+        console.error('Error accessing microphone:', err);
+      });
+  }
+
+  function stopRecording() {
+    recorder.stop();
+    recorder.exportWAV(function (blob) {
+      audioPlayer.src = URL.createObjectURL(blob);
+      downloadButton.href = audioPlayer.src;
+      downloadButton.download = 'recording.wav';
+      recordButton.disabled = false;
+      stopButton.disabled = true;
+      playButton.disabled = false;
+      downloadButton.disabled = false;
+      predictButton.disabled = false;
+    });
+
+    recorder.clear();
+  }
+
+  function playRecording() {
+    audioPlayer.play();
+  }
+
+  function downloadRecording() {
+    // Already handled in stopRecording()
+  }
+
+  function handleFileSelect(event) {
+    const file = event.target.files[0];
+    const fileReader = new FileReader();
+
+    fileReader.onload = function (event) {
+      const audioUrl = event.target.result;
+      audioPlayer.src = audioUrl;
+      playSelectedButton.disabled = false;
+      predictButton.disabled = false;
+    };
+
+    fileReader.readAsDataURL(file);
+  }
+
+  function playSelectedFile() {
+    audioPlayer.play();
+  }
+
+  function predict() {
+    // Get the selected audio file from the file input field
+    const audioFile = document.getElementById('audio').files[0];
+  
+    // Create a FormData object to store the file data
+    const formData = new FormData();
+    formData.append('audio', audioFile);
+  
+    // Send a POST request to the server with the file data
+    fetch('/predict', {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => response.text())
+      .then(prediction => {
+        // Handle the prediction result
+        console.log('Predicted Emotion:', prediction);
+      })
+      .catch(error => {
+        // Handle any errors that occur during the request
+        console.error('Error:', error);
+      });
+  }
+  
+
+
+//
+  //function predictAudio() {
+  //  const audioData = new FormData();
+  //  audioData.append('audio', audioPlayer.src);
+
+ //   fetch('/predict', {
+     // method: 'POST',
+//body: audioData
+   // })
+  //    .then(response => response.text())
+  //    .then(data => {
+  //      predictionOutput.value = `Predicted Emotion: ${data}`;
+ //     })
+ //     .catch(error => {
+  //      console.error('Error predicting audio emotion:', error);
+  //      predictionOutput.value = 'Error predicting audio emotion.';
+  //    });
+ // } 
+  </script>
+  <footer class="bg-dark text-white text-center py-3">
+    <p>&copy; 2023 Voice Emotion Detection Team. All rights reserved.</p>
+  </footer>
+</body>
+</html>
